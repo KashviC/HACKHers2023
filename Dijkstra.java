@@ -1,18 +1,10 @@
 import java.util.*;
 
+//class for the logic that determines the best path for the customer to take
 public class Dijkstra {
-//    private static double[][] coords = {
-//        {2.25, 0.50},
-//        {4.75, 0.25},
-//        {2.75, 0.375},
-//        {0.875, 0.75},
-//        {4.75, 3.00},
-//        {2.75, 2.875},
-//        {3.25, 3.25},
-//        {4.75, 1.75},
-//        {6.25, 0.875},
-//        {6.625, 2.00}
-//    }, dist;
+
+    //hard-coded double 2d array of the coordinates of each department, found by imposing a grid on the image of the floorplan
+    //(if we go further with this project, this would be automatic for each floorplan)
     private static double[][] coords = {
             {15.0, 10.0},
             {23.0, 11.0},
@@ -25,18 +17,9 @@ public class Dijkstra {
             {28.0, 9.00},
             {29.5, 4.00}
         }, dist;
-//    private static boolean[][] walls = {
-//      {false,  true,  true,  true,  true,  true,  true,  true,  true,  true},
-//      { true, false,  true,  true, false,  true, false, false, false,  true},
-//      { true,  true, false,  true,  true,  true,  true,  true,  true,  true},
-//      { true,  true,  true, false,  true,  true,  true,  true,  true,  true},
-//      { true, false,  true,  true, false, false, false, false, false, false},
-//      { true,  true,  true,  true, false, false, false, false,  true,  true},
-//      { true, false,  true,  true, false, false, false, false,  true, false},
-//      { true, false,  true,  true, false, false, false, false, false,  true},
-//      { true, false,  true,  true, false,  true,  true, false, false, false},
-//      { true,  true,  true,  true, false,  true, false,  true, false, false}
-//    };
+
+    //hard-coded boolean 2d array to signify walls between each depts
+    //(if we go further with this project, this would be automatic for each floorplan)
     private static boolean[][] walls = {
     	{false,  true,  true,  true,  true,  true,  true,  true,  true,  true},
     	{ true, false, false, false, false,  true, false, false, false,  true},
@@ -49,7 +32,11 @@ public class Dijkstra {
     	{ true, false, false,  true, false,  true,  true, false, false, false},
     	{ true,  true,  true,  true, false,  true, false,  true, false, false}
       };
+    
+    //weights to assign importance to each dept (lower weight = higher importance)
+    //ensures a correctly working system, in which the depts furthest from the entrance are more likely to be chosen near the end
     private static double[] weights = {0.00, 0.00, 1.00, 1.05, 0.77, 0.90, 0.875, 0.85, 0.65, 0.70};
+
     private static String[] allDeps = {"Entrance", "Checkout", "Floral", "Produce", "Meat", "Bakery", "Seafood", "Grocery", "Frozen", "Dairy"};
     private static ArrayList<String> targets;
     private static ArrayList<Integer> targetsInts;
@@ -67,21 +54,21 @@ public class Dijkstra {
         targets = new ArrayList<>(departments);
         targetsInts = new ArrayList<>();
 
-        for (int i = 0; i < targets.size(); i++) {
-            targetsInts.add(allDepsMap.get(targets.get(i)));
-        }
+        for (int i = 0; i < targets.size(); i++) {targetsInts.add(allDepsMap.get(targets.get(i)));}
         for (int i = 0; i < len; i++) {deps[i] = new Node(allDeps[i]);} //coords
         enterCoords(coords, deps);
     }
 
+    //continue to fill in all needed arrays as well as call the method to find the weighted distances between depts
     private static void enterCoords(double[][] coords, Node[] deps) {
         for (int i = 0; i < len; i++) {
             deps[i].enterCoords(coords[i][0], coords[i][1]);
         }
 
-        findDists(); //call if distances aren't entered in manually
+        findDists();
     }
 
+    //calculate the distance from each dept to each other dept, taking into account the existence of walls and the weights
     private static void findDists() {
         dist = new double[len][len];
 
@@ -96,10 +83,12 @@ public class Dijkstra {
         }
     }
 
+    //simplify job for other collaborators
     public static ArrayList<Node> pathFinder() {
         return pathFinder(dist, deps[1], targetsInts);
     }
 
+    //modified dijkstras
     private static ArrayList<Node> pathFinder(double[][] dist, Node source, ArrayList<Integer> targets) {
         Double[][] List1 = new Double[targets.size()][2]; //stores each target and its quickest path from source(dijk)
         ArrayList<ArrayList<Integer>> List2 = new ArrayList<>(); //stores each node within quickest paths to each target labeled with that target
@@ -138,14 +127,17 @@ public class Dijkstra {
             s = closestDest; //closest node is new source
 
             targets.remove(Integer.valueOf(closestDest)); //remove new source
-            List1 = new Double[targets.size()][2]; //reinstatiate lists and pointer
+
+            //reinstatiate lists and pointer
+            List1 = new Double[targets.size()][2]; 
             List2 = new ArrayList<>();
             l1Ptr = -1;
         }
-        Collections.reverse(path);
+        Collections.reverse(path); //reverse path so the checkout is at the end and at entrance is at the beginning
         return path;
     }
 
+    //basic dijkstras, one source, one target
     private static ArrayList<Integer> dijkstras(double[][] dist, int source, int target) {
         double[] distance = new double[len]; //distance from source
         int[] prev = new int[len]; //gives quickest path from source to target using "previous" nodes in path

@@ -1,3 +1,5 @@
+//basic Node class that stores the name and coordinates of each department
+//used to simplify the dijkstras and pathFinder methods (reduces the number of arrays that need to be worked with by two)
 public class Node {
     String name;
     double x, y;

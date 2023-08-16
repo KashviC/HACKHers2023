@@ -1,2 +1,2 @@
 # HACKHers2023
-This was our project for HACKHERS2023
+Our team's project for HACKHers2023.
